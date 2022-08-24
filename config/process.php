@@ -5,41 +5,90 @@
     include_once("connection.php");
     include_once("url.php");
 
-    $id;
+    $data = $_POST;
 
-    if(!empty($_GET)) {
+    // DATABASE UPDATES
+    if(!empty($data)) {
 
-        $id = $_GET['id'];
+        // CREATE CONTACT
+        if($data["type"] === "create") {
+
+            $name = $data["name"];
+            $phone = $data["phone"];
+            $observations = $data["observations"];
+
+            $query = "INSERT INTO contacts (name, phone, observations) VALUES (:name, :phone, :observations)";
+
+            $stmt = $conn->prepare($query);
+
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":phone", $phone);
+            $stmt->bindParam(":observations", $observations);
+
+            try {
+
+                $stmt->execute();
+                $_SESSION["msg"] = "Contato criado com sucesso!";
+
+            }
+            catch(PDOException $e) {
+
+                // Connection error
+                $error = $e->getMessage();
+                echo "Erro: $error";
+
+            }
+
+
+        }
+
+        // REDIRECT TO HOME
+        header("Location:" . $BASE_URL . "../index.php");
 
     }
-
-    // Return one single contact
-    if(!empty($id)) {
-
-        $query = "SELECT * FROM contacts WHERE id = :id";
-
-        $stmt = $conn->prepare($query);
-
-        $stmt->bindParam(":id", $id);
-
-        $stmt->execute();
-
-        $contact = $stmt->fetch();
-
-    }
+    // DATA SELECTION
     else {
 
-    // Return all contacts
-    $contacts = [];
+        $id;
 
-    $query = "SELECT * FROM contacts";
+        if(!empty($_GET)) {
 
-    $stmt = $conn->prepare($query);
+            $id = $_GET['id'];
 
-    $stmt->execute();
+        }
 
-    $contacts = $stmt->fetchAll();
+        // Return one single contact
+        if(!empty($id)) {
+
+            $query = "SELECT * FROM contacts WHERE id = :id";
+
+            $stmt = $conn->prepare($query);
+
+            $stmt->bindParam(":id", $id);
+
+            $stmt->execute();
+
+            $contact = $stmt->fetch();
+
+        }
+        else {
+
+            // Return all contacts
+            $contacts = [];
+
+            $query = "SELECT * FROM contacts";
+
+            $stmt = $conn->prepare($query);
+
+            $stmt->execute();
+
+            $contacts = $stmt->fetchAll();
+
+        }
 
     }
+
+    // CLOSE CONNECTION
+    $conn = null;
 
 ?>
