@@ -22,12 +22,12 @@
     font-weight: bold;
 }
 
-.action {
+.actions {
     text-align: right;
     width: 150px;
 }
 
-.action i {
+.actions i {
     font-size: 18px;
     margin-right: 5px;
 }
@@ -38,6 +38,10 @@
 
 .edit-icon {
     color: #007bff;
+}
+
+.delete-form {
+    display: inline-block;
 }
 
 .delete-btn {
